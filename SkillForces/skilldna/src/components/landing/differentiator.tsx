@@ -29,7 +29,7 @@ const pipelineSteps = [
 
 export function LandingDifferentiator() {
   return (
-    <section className="py-20 lg:py-32 relative overflow-hidden">
+    <section id="differentiator" className="py-20 lg:py-32 relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-500/5 via-transparent to-blue-500/5" />
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">

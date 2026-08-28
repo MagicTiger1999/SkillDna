@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Separator } from "@/components/ui/separator"
 import { 
   LayoutDashboard, 
   Dna, 
@@ -53,6 +52,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 1024
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setSidebarOpen(false)
+    }
+  }
+
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       <aside
@@ -87,6 +94,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.name}
                   href={item.href}
+                  onClick={handleNavClick}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     isActive
@@ -108,7 +116,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               className="w-full justify-start gap-3"
               asChild
             >
-              <Link href="/">
+              <Link href="/" onClick={handleNavClick}>
                 <Users className="h-4 w-4" />
                 {sidebarOpen && <span>Sign Out</span>}
               </Link>
