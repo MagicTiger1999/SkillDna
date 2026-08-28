@@ -146,24 +146,40 @@ export default function SkillDNAPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64 flex items-center justify-center">
+                  <div className="h-96 flex items-center justify-center pb-4">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsPieChartType>
                         <Pie
                           data={skills.map(s => ({ name: s.name, value: s.value }))}
                           cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={100}
+                          cy="35%"
+                          innerRadius={45}
+                          outerRadius={70}
                           fill="#8884d8"
                           paddingAngle={2}
                           dataKey="value"
-                          label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
+                          label={({ name, percent, x, y, cx, index }) => {
+                            const shortName = name === "Data Structures & Algorithms" ? "DSA" : name === "Web Development" ? "Web Dev" : name;
+                            const textAnchor = x > cx ? "start" : "end";
+                            const color = skills[index]?.color || "currentColor";
+                            return (
+                              <text 
+                                x={x} 
+                                y={y} 
+                                fill={color} 
+                                fontSize={10} 
+                                textAnchor={textAnchor}
+                                dominantBaseline="central"
+                              >
+                                {`${percent ? (percent * 100).toFixed(0) : 0}% ${shortName}`}
+                              </text>
+                            );
+                          }}
                         >
                           {skills.map((s, i) => <PieCell key={`cell-${i}`} fill={s.color} />)}
                         </Pie>
                         <Tooltip />
-                        <Legend />
+                        <Legend wrapperStyle={{ fontSize: '12px', marginTop: '20px' }} />
                       </RechartsPieChartType>
                     </ResponsiveContainer>
                   </div>
@@ -178,15 +194,45 @@ export default function SkillDNAPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64">
+                  <div className="h-80 pt-6">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={skills.map(s => ({ ...s, demandScore: s.demand === "critical" ? 100 : s.demand === "high" ? 80 : s.demand === "medium" ? 60 : 40 }))}>
-                        <XAxis dataKey="name" tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} />
+                      <BarChart 
+                        data={skills
+                          .map(s => {
+                            let displayName = s.name;
+                            if (s.id === "dsa") displayName = "DSA";
+                            else if (s.id === "web") displayName = "Web Dev";
+                            else if (s.id === "programming") displayName = "Prog";
+                            else if (s.id === "ml") displayName = "ML";
+                            else if (s.id === "git") displayName = "Git";
+                            else if (s.id === "comm") displayName = "Comm";
+                            else if (s.id === "problem") displayName = "Problem";
+                            return { 
+                              ...s, 
+                              displayName,
+                              demandScore: s.demand === "critical" ? 100 : s.demand === "high" ? 80 : s.demand === "medium" ? 60 : 40 
+                            };
+                          })
+                        } 
+                        margin={{ top: 20, right: 10, left: -10, bottom: 5 }}
+                      >
+                        <XAxis dataKey="displayName" tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} />
                         <YAxis />
                         <Tooltip />
-                        <Legend />
-                        <Bar dataKey="value" name="Proficiency" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="demandScore" name="Industry Demand" fill="#a855f7" radius={[4, 4, 0, 0]} />
+                        <Legend 
+                          wrapperStyle={{ paddingTop: "20px" }} 
+                          formatter={(value) => <span style={{ marginRight: "25px", color: "var(--muted-foreground)", fontSize: "12px" }}>{value}</span>}
+                        />
+                        <Bar dataKey="value" name="Proficiency" fill="#475569" radius={[4, 4, 0, 0]}>
+                          {skills.map((s, i) => (
+                            <PieCell key={`cell-prof-${i}`} fill={s.color} />
+                          ))}
+                        </Bar>
+                        <Bar dataKey="demandScore" name="Industry Demand" fill="#e2e8f0" fillOpacity={0.6} radius={[4, 4, 0, 0]}>
+                          {skills.map((s, i) => (
+                            <PieCell key={`cell-demand-${i}`} fill={s.color} fillOpacity={0.4} />
+                          ))}
+                        </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   </div>

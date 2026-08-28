@@ -42,7 +42,7 @@ import {
   CheckCircle,
   Upload
 } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function SettingsPage() {
@@ -69,14 +69,25 @@ export default function SettingsPage() {
     bio: "Aspiring AI Engineer passionate about ML and building intelligent systems.",
     location: "Bangalore, India",
     website: "https://satyam.dev",
-    linkedin: "satyam-kumar",
-    github: "satyamk",
-    twitter: "",
+    linkedin: "example.com",
+    github: "example.com",
+    twitter: "example.com",
   })
+
+  useEffect(() => {
+    const saved = localStorage.getItem("skilldna-profile")
+    if (saved) {
+      try {
+        setProfile(JSON.parse(saved))
+      } catch (e) {}
+    }
+  }, [])
 
   const handleSave = async () => {
     setIsSaving(true)
     await new Promise(r => setTimeout(r, 1000))
+    localStorage.setItem("skilldna-profile", JSON.stringify(profile))
+    window.dispatchEvent(new Event("profile-updated"))
     setIsSaving(false)
   }
 
@@ -111,11 +122,13 @@ export default function SettingsPage() {
                     <CardTitle>Profile Photo</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-center justify-center flex-col">
-                      <Avatar className="h-24 w-24">
+                    <div className="flex items-center justify-center flex-col text-center">
+                      <Avatar className="h-24 w-24 mb-3">
                         <AvatarImage src="" alt="Profile" />
                         <AvatarFallback className="text-2xl">SK</AvatarFallback>
                       </Avatar>
+                      <h3 className="font-semibold text-lg">{profile.name}</h3>
+                      <p className="text-sm text-muted-foreground">{profile.email}</p>
                     </div>
                     <div className="flex flex-col gap-2 text-center">
                       <Button variant="outline" className="w-full">
@@ -135,9 +148,9 @@ export default function SettingsPage() {
                     <CardTitle>Social Links</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <SocialInput label="LinkedIn" icon={LinkedinIcon} value={profile.linkedin} onChange={(v) => setProfile({...profile, linkedin: v})} placeholder="satyam-kumar" prefix="linkedin.com/in/" />
-                    <SocialInput label="GitHub" icon={GitBranch} value={profile.github} onChange={(v) => setProfile({...profile, github: v})} placeholder="satyamk" prefix="github.com/" />
-                    <SocialInput label="Twitter/X" icon={TwitterIcon} value={profile.twitter} onChange={(v) => setProfile({...profile, twitter: v})} placeholder="satyamk" prefix="x.com/" />
+                    <SocialInput label="LinkedIn" icon={LinkedinIcon} value={profile.linkedin} onChange={(v) => setProfile({...profile, linkedin: v})} placeholder="example.h" prefix="linkedin.com/in/" />
+                    <SocialInput label="GitHub" icon={GitBranch} value={profile.github} onChange={(v) => setProfile({...profile, github: v})} placeholder="example.h" prefix="github.com/" />
+                    <SocialInput label="Twitter/X" icon={TwitterIcon} value={profile.twitter} onChange={(v) => setProfile({...profile, twitter: v})} placeholder="example.h" prefix="x.com/" />
                     <SocialInput label="Website" icon={Globe} value={profile.website} onChange={(v) => setProfile({...profile, website: v})} placeholder="https://satyam.dev" prefix="" />
                   </CardContent>
                 </Card>
@@ -482,7 +495,7 @@ export default function SettingsPage() {
                   <div className="space-y-3">
                     {[
                       { name: "Google", icon: "G", connected: true, email: "satyam@gmail.com" },
-                      { name: "GitHub", icon: "GH", connected: true, email: "satyamk" },
+                      { name: "GitHub", icon: "GH", connected: true, email: profile.github },
                       { name: "LinkedIn", icon: "in", connected: false, email: "" },
                     ].map((acc) => (
                       <div key={acc.name} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border/50">
@@ -525,11 +538,11 @@ export default function SettingsPage() {
   )
 }
 
-function FormField({ label, icon, children }: { label: string; icon: React.ReactNode; children: React.ReactNode }) {
+function FormField({ label, icon: Icon, children }: { label: string; icon: React.ComponentType<any>; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <Label className="flex items-center gap-2">
-        <icon className="h-4 w-4" />
+        <Icon className="h-4 w-4" />
         {label}
       </Label>
       {children}
@@ -537,27 +550,50 @@ function FormField({ label, icon, children }: { label: string; icon: React.React
   )
 }
 
-function SocialInput({ label, icon, value, onChange, placeholder, prefix }: any) {
+interface SocialInputProps {
+  label: string;
+  icon?: React.ComponentType<any>;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  prefix?: string;
+}
+
+function SocialInput({ label, icon: Icon, value, onChange, placeholder, prefix }: SocialInputProps) {
   return (
     <div className="space-y-1">
       <Label className="flex items-center gap-2 text-sm">
-        <icon className="h-4 w-4" />
+        {Icon && <Icon className="h-4 w-4" />}
         {label}
       </Label>
-      <div className="relative">
-        {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">{prefix}</span>}
+      <div className="flex rounded-md shadow-sm w-full">
+        {prefix && (
+          <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-border bg-muted/80 text-muted-foreground text-sm select-none">
+            {prefix}
+          </span>
+        )}
         <Input
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className={cn(prefix && "pl-[calc(var(--spacing)*10)]")}
+          className={cn(
+            "flex-1 min-w-0 w-0",
+            prefix ? "rounded-l-none" : "rounded-md"
+          )}
         />
       </div>
     </div>
   )
 }
 
-function NotificationToggle({ label, description, enabled, onChange }: any) {
+interface ToggleProps {
+  label: string;
+  description: string;
+  enabled: boolean;
+  onChange: (v: boolean) => void;
+}
+
+function NotificationToggle({ label, description, enabled, onChange }: ToggleProps) {
   return (
     <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border/50">
       <div className="flex-1">
@@ -569,7 +605,7 @@ function NotificationToggle({ label, description, enabled, onChange }: any) {
   )
 }
 
-function PrivacyToggle({ label, description, enabled, onChange }: any) {
+function PrivacyToggle({ label, description, enabled, onChange }: ToggleProps) {
   return (
     <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border/50">
       <div className="flex-1">
@@ -581,7 +617,15 @@ function PrivacyToggle({ label, description, enabled, onChange }: any) {
   )
 }
 
-function PrivacyOption({ value, label, description, selected, onSelect }: any) {
+interface PrivacyOptionProps {
+  value: string;
+  label: string;
+  description: string;
+  selected: boolean;
+  onSelect: () => void;
+}
+
+function PrivacyOption({ value, label, description, selected, onSelect }: PrivacyOptionProps) {
   return (
     <button
       onClick={onSelect}

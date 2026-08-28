@@ -42,7 +42,7 @@ import {
   AlertTriangle
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 const profileData = {
   name: "Satyam Kumar",
@@ -64,8 +64,8 @@ const profileData = {
   ],
   social: {
     linkedin: "linkedin.com/in/satyam-kumar",
-    github: "github.com/satyamk",
-    twitter: "x.com/satyamk",
+    github: "github.com/shome-t",
+    twitter: "x.com/soumyajit-b",
     website: "satyam.dev",
   },
   achievements: [
@@ -93,6 +93,39 @@ const profileData = {
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("overview")
   const [isEditing, setIsEditing] = useState(false)
+  const [profile, setProfile] = useState({
+    name: "Satyam Kumar",
+    email: "satyam@example.com",
+    bio: "Aspiring AI Engineer passionate about ML and building intelligent systems.",
+    location: "Bangalore, India",
+    website: "https://satyam.dev",
+    linkedin: "example.h",
+    github: "example.h",
+    twitter: "example.h",
+  })
+
+  useEffect(() => {
+    const saved = localStorage.getItem("skilldna-profile")
+    if (saved) {
+      try {
+        setProfile(JSON.parse(saved))
+      } catch (e) {}
+    }
+  }, [])
+
+  const mergedProfile = {
+    ...profileData,
+    name: profile.name,
+    bio: profile.bio,
+    location: profile.location,
+    email: profile.email,
+    social: {
+      linkedin: profile.linkedin.includes("linkedin.com") ? profile.linkedin : `linkedin.com/in/${profile.linkedin}`,
+      github: profile.github.includes("github.com") ? profile.github : `github.com/${profile.github}`,
+      twitter: profile.twitter.includes("x.com") || profile.twitter.includes("twitter.com") ? profile.twitter : `x.com/${profile.twitter}`,
+      website: profile.website,
+    }
+  }
 
   return (
     <DashboardLayout>
@@ -133,38 +166,38 @@ export default function ProfilePage() {
                 <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
                   <div className="relative">
                     <Avatar className="h-32 w-32">
-                      <AvatarImage src="" alt={profileData.name} />
+                      <AvatarImage src="" alt={mergedProfile.name} />
                       <AvatarFallback className="text-4xl">SK</AvatarFallback>
                     </Avatar>
                     {isEditing && (
-                      <Button variant="premium" size="icon" className="absolute bottom-2 right-2 h-10 w-10">
+                      <Button variant="default" size="icon" className="absolute bottom-2 right-2 h-10 w-10 bg-gradient-to-r from-blue-500 to-indigo-600">
                         <Edit className="h-5 w-5" />
                       </Button>
                     )}
                   </div>
                   <div className="flex-1 text-center md:text-left space-y-4">
                     <div className="flex items-center justify-center md:justify-start gap-3 flex-wrap">
-                      <h1 className="text-3xl font-bold">{profileData.name}</h1>
-                      <Badge variant="premium" className="text-sm">{profileData.role}</Badge>
+                      <h1 className="text-3xl font-bold">{mergedProfile.name}</h1>
+                      <Badge variant="default" className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0">{mergedProfile.role}</Badge>
                     </div>
-                    <p className="text-muted-foreground max-w-2xl mx-auto md:mx-0">{profileData.bio}</p>
+                    <p className="text-muted-foreground max-w-2xl mx-auto md:mx-0">{mergedProfile.bio}</p>
                     <div className="flex items-center justify-center md:justify-start gap-6 text-sm text-muted-foreground flex-wrap">
-                      <div className="flex items-center gap-1"><MapPin className="h-4 w-4" />{profileData.location}</div>
-                      <div className="flex items-center gap-1"><Mail className="h-4 w-4" />{profileData.email}</div>
-                      <div className="flex items-center gap-1"><Calendar className="h-4 w-4" />Joined {profileData.joinDate}</div>
+                      <div className="flex items-center gap-1"><MapPin className="h-4 w-4" />{mergedProfile.location}</div>
+                      <div className="flex items-center gap-1"><Mail className="h-4 w-4" />{mergedProfile.email}</div>
+                      <div className="flex items-center gap-1"><Calendar className="h-4 w-4" />Joined {mergedProfile.joinDate}</div>
                     </div>
                     <div className="flex items-center justify-center md:justify-start gap-4 flex-wrap">
-                      <SocialLink icon={LinkedinIcon} href={`https://${profileData.social.linkedin}`} label="LinkedIn" />
-                      <SocialLink icon={GitBranch} href={`https://${profileData.social.github}`} label="GitHub" />
-                      <SocialLink icon={TwitterIcon} href={`https://${profileData.social.twitter}`} label="Twitter" />
-                      <SocialLink icon={Globe} href={`https://${profileData.social.website}`} label="Website" />
+                      <SocialLink icon={LinkedinIcon} href={`https://${mergedProfile.social.linkedin}`} label="LinkedIn" />
+                      <SocialLink icon={GitBranch} href={`https://${mergedProfile.social.github}`} label="GitHub" />
+                      <SocialLink icon={TwitterIcon} href={`https://${mergedProfile.social.twitter}`} label="Twitter" />
+                      <SocialLink icon={Globe} href={`https://${mergedProfile.social.website}`} label="Website" />
                     </div>
                   </div>
                   <div className="grid grid-cols-4 gap-4 text-center w-full md:w-auto">
-                    <StatItem label="Projects" value={profileData.stats.projects} icon={Code} color="#3b82f6" />
-                    <StatItem label="Articles" value={profileData.stats.articles} icon={BookOpen} color="#a855f7" />
-                    <StatItem label="Hours" value={profileData.stats.hours} icon={Clock} color="#ec4899" />
-                    <StatItem label="Streak" value={`${profileData.stats.streak} days`} icon={Flame} color="#f59e0b" />
+                    <StatItem label="Projects" value={mergedProfile.stats.projects} icon={Code} color="#3b82f6" />
+                    <StatItem label="Articles" value={mergedProfile.stats.articles} icon={BookOpen} color="#a855f7" />
+                    <StatItem label="Hours" value={mergedProfile.stats.hours} icon={Clock} color="#ec4899" />
+                    <StatItem label="Streak" value={`${mergedProfile.stats.streak} days`} icon={Flame} color="#f59e0b" />
                   </div>
                 </div>
               </CardContent>
@@ -177,7 +210,7 @@ export default function ProfilePage() {
                     <Target className="h-5 w-5" />
                     Current Focus
                   </CardTitle>
-                  <Badge variant="premium">Week 3 of 12</Badge>
+                  <Badge variant="default" className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-0">Week 3 of 12</Badge>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
@@ -292,11 +325,11 @@ export default function ProfilePage() {
   )
 }
 
-function StatItem({ label, value, icon, color }: any) {
+function StatItem({ label, value, icon: Icon, color }: any) {
   return (
     <div className="p-4 rounded-xl bg-muted/50 border border-border/50">
       <div className="flex h-10 w-10 items-center justify-center rounded-lg mx-auto mb-2" style={{ backgroundColor: `${color}20` }}>
-        <icon className="h-5 w-5" style={{ color }} />
+        <Icon className="h-5 w-5" style={{ color }} />
       </div>
       <p className="text-2xl font-bold">{value}</p>
       <p className="text-xs text-muted-foreground">{label}</p>
@@ -304,19 +337,19 @@ function StatItem({ label, value, icon, color }: any) {
   )
 }
 
-function SocialLink({ icon, href, label }: any) {
+function SocialLink({ icon: Icon, href, label }: any) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
-      <icon className="h-4 w-4" />
+      <Icon className="h-4 w-4" />
       <span>{label}</span>
     </a>
   )
 }
 
-function FocusItem({ label, value, target, icon }: any) {
+function FocusItem({ label, value, target, icon: Icon }: any) {
   return (
     <div className="p-3 rounded-lg bg-muted/50 border border-border/50 text-center">
-      <icon className="h-5 w-5 mx-auto text-muted-foreground mb-1" />
+      <Icon className="h-5 w-5 mx-auto text-muted-foreground mb-1" />
       <p className="text-sm text-muted-foreground">{label}</p>
       <p className="font-bold">{value}</p>
       <p className="text-xs text-muted-foreground">Target: {target}</p>
@@ -324,11 +357,11 @@ function FocusItem({ label, value, target, icon }: any) {
   )
 }
 
-function SkillSummaryItem({ label, value, sub, color, icon }: any) {
+function SkillSummaryItem({ label, value, sub, color, icon: Icon }: any) {
   return (
     <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
       <div className="flex items-center gap-2 mb-1">
-        <icon className="h-4 w-4" style={{ color }} />
+        <Icon className="h-4 w-4" style={{ color }} />
         <span className="text-sm text-muted-foreground">{label}</span>
       </div>
       <div className="flex items-baseline gap-1">
@@ -406,8 +439,8 @@ function AchievementRow({ ach }: { ach: any }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <h4 className="font-semibold truncate">{ach.title}</h4>
-          <Badge variant="outline" className="text-xs" style={{ borderColor: `${typeColors[ach.type]}40`, color: typeColors[ach.type] }}>
-            {typeLabels[ach.type]}
+          <Badge variant="outline" className="text-xs" style={{ borderColor: `${typeColors[ach.type as keyof typeof typeColors]}40`, color: typeColors[ach.type as keyof typeof typeColors] }}>
+            {typeLabels[ach.type as keyof typeof typeLabels]}
           </Badge>
         </div>
         <p className="text-sm text-muted-foreground truncate">{ach.desc}</p>
@@ -420,12 +453,12 @@ function AchievementRow({ ach }: { ach: any }) {
 function ActivityRow({ activity }: { activity: any }) {
   const typeIcons = { completion: CheckCircle, analysis: Brain, skill: TrendingUp, reading: BookOpen, milestone: Trophy }
   const typeColors = { completion: "#22c55e", analysis: "#ec4899", skill: "#3b82f6", reading: "#a855f7", milestone: "#f59e0b" }
-  const Icon = typeIcons[activity.type]
+  const Icon = typeIcons[activity.type as keyof typeof typeIcons]
 
   return (
     <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border/50">
-      <div className="flex h-8 w-8 items-center justify-center rounded-lg flex-shrink-0" style={{ backgroundColor: `${typeColors[activity.type]}20` }}>
-        <Icon className="h-4 w-4" style={{ color: typeColors[activity.type] }} />
+      <div className="flex h-8 w-8 items-center justify-center rounded-lg flex-shrink-0" style={{ backgroundColor: `${typeColors[activity.type as keyof typeof typeColors]}20` }}>
+        <Icon className="h-4 w-4" style={{ color: typeColors[activity.type as keyof typeof typeColors] }} />
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-medium">{activity.action}</p>

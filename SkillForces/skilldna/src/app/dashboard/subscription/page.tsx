@@ -215,7 +215,7 @@ export default function SubscriptionPage() {
             <h1 className="text-2xl font-bold">Subscription Plans</h1>
             <p className="text-muted-foreground">Choose the plan that fits your learning journey</p>
           </div>
-          <Badge variant="premium" className="text-sm">
+          <Badge variant="default" className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-0 text-sm shadow-sm">
             <Crown className="mr-1 h-3 w-3" />
             You're on Free Plan
           </Badge>
@@ -331,7 +331,7 @@ function PlanCard({ plan, selected, onSelect, onUpgrade, isProcessing }: any) {
     <Card className={cn("relative flex flex-col h-full transition-all", plan.bgColor, selected && "ring-2 ring-primary")}>
       {plan.popular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <Badge variant="premium" className="text-xs">{plan.badge}</Badge>
+          <Badge variant="default" className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-0 text-xs shadow-sm">{plan.badge}</Badge>
         </div>
       )}
       <CardHeader className="text-center pb-4">
@@ -368,7 +368,7 @@ function PlanCard({ plan, selected, onSelect, onUpgrade, isProcessing }: any) {
           onClick={() => { onSelect(); onUpgrade(plan.id); }}
           disabled={plan.id === "free" || isProcessing}
         >
-          {isProcessing && selectedPlan === plan.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : plan.cta}
+          {isProcessing && selected ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : plan.cta}
         </Button>
       </CardFooter>
     </Card>

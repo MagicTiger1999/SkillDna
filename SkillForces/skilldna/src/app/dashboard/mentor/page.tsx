@@ -259,7 +259,7 @@ export default function AIPromptPage() {
                   <ContextToggle label="Learning Roadmap" enabled />
                   <ContextToggle label="Project Portfolio" enabled />
                   <ContextToggle label="Job Preferences" enabled />
-                  <ContextToggle label="Interview History" disabled />
+                  <ContextToggle label="Interview History" enabled={false} />
                 </div>
                 <div className="border-t border-border/50 pt-4">
                   <h4 className="font-semibold mb-4">Mentor Personality</h4>

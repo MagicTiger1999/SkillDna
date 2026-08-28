@@ -50,7 +50,7 @@ Responsibilities:
 export default function JobAnalyzerPage() {
   const [activeTab, setActiveTab] = useState("analyze")
   const [jobDescription, setJobDescription] = useState(sampleJD)
-  const [analysis, setAnalysis] = useState(null)
+  const [analysis, setAnalysis] = useState<any>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
 
   const handleAnalyze = async () => {

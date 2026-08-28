@@ -234,7 +234,7 @@ import { X, Briefcase } from "lucide-react"
 function ProjectAnalyzerForm({ onComplete }: { onComplete: () => void }) {
   const [formData, setFormData] = useState({ name: "", description: "", githubUrl: "", techStack: "", readme: "" })
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [result, setResult] = useState(null)
+  const [result, setResult] = useState<any>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

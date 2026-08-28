@@ -80,13 +80,13 @@ export default function ProgressPage() {
 
   const overallProgress = historyData.map(d => ({
     month: d.month,
-    average: Math.round(Object.values(d).slice(1).reduce((a, b) => a + b, 0) / 8)
+    average: Math.round(Object.values(d).slice(1).reduce((a: number, b: any) => a + Number(b), 0) / 8)
   }))
 
   const skillData = historyData.map(d => ({ month: d.month, value: d[selectedSkill as keyof typeof d] }))
   const currentValue = currentValues[selectedSkill as keyof typeof currentValues]
   const startValue = historyData[0][selectedSkill as keyof typeof historyData[0]]
-  const totalGrowth = currentValue - startValue
+  const totalGrowth = Number(currentValue) - Number(startValue)
   const selectedSkillInfo = skills.find(s => s.id === selectedSkill)!
 
   return (
@@ -152,7 +152,7 @@ export default function ProgressPage() {
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
                         <YAxis stroke="hsl(var(--muted-foreground))" domain={[0, 100]} />
-                        <Tooltip formatter={(value: number) => [`${value}%`, "Average"]} />
+                        <Tooltip formatter={(value: any) => [`${value}%`, "Average"]} />
                         <Legend />
                         <Area type="monotone" dataKey="average" stroke="#3b82f6" fillOpacity={1} fill="url(#colorOverall)" strokeWidth={2} />
                       </AreaChart>
@@ -246,7 +246,7 @@ export default function ProgressPage() {
                           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                           <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
                           <YAxis stroke="hsl(var(--muted-foreground))" domain={[0, 100]} />
-                          <Tooltip formatter={(value: number) => [`${value}%`, "Proficiency"]} />
+                          <Tooltip formatter={(value: any) => [`${value}%`, "Proficiency"]} />
                           <Legend />
                           <Line type="monotone" dataKey="value" stroke={selectedSkillInfo.color} strokeWidth={3} dot={{ r: 6, strokeWidth: 3 }} activeDot={{ r: 8 }} />
                         </LineChart>
@@ -276,14 +276,15 @@ export default function ProgressPage() {
                   <CardContent>
                     <div className="space-y-2">
                       {historyData.map((d, i) => {
-                        const prev = i > 0 ? historyData[i-1][selectedSkill as keyof typeof historyData[0]] : startValue
-                        const change = d[selectedSkill as keyof typeof historyData[0]] - prev
+                        const val = d[selectedSkill as keyof typeof historyData[0]] as number
+                        const prev = i > 0 ? historyData[i-1][selectedSkill as keyof typeof historyData[0]] as number : (startValue as number)
+                        const change = val - prev
                         return (
                           <div key={d.month} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                             <span className="font-medium">{d.month}</span>
                             <div className="flex items-center gap-4">
-                              <span className={cn("font-bold", getProficiencyColor(d[selectedSkill as keyof typeof historyData[0]]))}>
-                                {d[selectedSkill as keyof typeof historyData[0]]}%
+                              <span className={cn("font-bold", getProficiencyColor(val))}>
+                                {val}%
                               </span>
                               <Badge variant={change >= 0 ? "gap" : "outline"} gapType={change >= 0 ? "moderate" : "minor"} className="text-xs">
                                 {change >= 0 ? "+" : ""}{change}%
