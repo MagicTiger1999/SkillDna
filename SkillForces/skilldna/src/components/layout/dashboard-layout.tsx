@@ -26,7 +26,8 @@ import {
   ChevronRight,
   Brain,
   Target,
-  Users
+  Users,
+  Crown
 } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
 
@@ -41,6 +42,7 @@ const navigation = [
   { name: "AI Mentor", href: "/dashboard/mentor", icon: Bot },
   { name: "Progress", href: "/dashboard/progress", icon: TrendingUp },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { name: "Subscription", href: "/dashboard/subscription", icon: Crown },
 ]
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -134,6 +136,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
               </Button>
 
+              <Link href="/dashboard/subscription">
+                <Button variant="premium" size="sm" className="hidden sm:flex items-center gap-2">
+                  <Crown className="h-4 w-4" />
+                  <span>Upgrade</span>
+                </Button>
+              </Link>
+
               <div className="hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-lg bg-muted/50 border border-border/50">
                 <Target className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium">AI Engineer</span>
@@ -164,6 +173,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard/profile" className="w-full">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/subscription" className="w-full flex items-center gap-2">
+                      <Crown className="h-4 w-4" />
+                      Subscription
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })} className="text-red-400 focus:text-red-400">
