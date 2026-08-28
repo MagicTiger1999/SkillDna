@@ -24,7 +24,10 @@ import {
   Brain,
   Target,
   Users,
-  Crown
+  Crown,
+  Menu,
+  X,
+  LogOut
 } from "lucide-react"
 
 const navigation = [
@@ -42,8 +45,10 @@ const navigation = [
 ]
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
+  
   const session = {
     user: {
       name: "Satyam Kumar",
@@ -52,94 +57,171 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 1024
-
-  const handleNavClick = () => {
-    if (isMobile) {
-      setSidebarOpen(false)
-    }
-  }
+  const closeMobileMenu = () => setMobileMenuOpen(false)
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
+      {/* Desktop Sidebar (hidden on mobile) */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-40 h-screen bg-card border-r border-border/50 transition-all duration-300",
-          sidebarOpen ? "w-64" : "w-20"
+          "hidden lg:flex fixed left-0 top-0 z-40 h-screen bg-card border-r border-border/50 transition-all duration-300 flex-col",
+          desktopSidebarOpen ? "w-64" : "w-20"
         )}
       >
-        <div className="flex h-full flex-col">
-          <div className="flex h-16 items-center justify-between px-4 border-b border-border/50">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
+        <div className="flex h-16 items-center justify-between px-4 border-b border-border/50">
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-md shadow-blue-500/20">
+              <Brain className="h-5 w-5 text-white" />
+            </div>
+            {desktopSidebarOpen && <span className="font-semibold text-lg gradient-text">SkillDNA</span>}
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label={desktopSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            {desktopSidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          </Button>
+        </div>
+
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" role="navigation" aria-label="Main navigation">
+          {navigation.map((item) => {
+            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                )}
+                title={desktopSidebarOpen ? undefined : item.name}
+              >
+                <item.icon className={cn("h-5 w-5 flex-shrink-0", isActive && "text-primary")} />
+                {desktopSidebarOpen && <span>{item.name}</span>}
+              </Link>
+            )
+          })}
+        </nav>
+
+        <div className="p-3 border-t border-border/50">
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-3"
+            asChild
+          >
+            <Link href="/">
+              <Users className="h-4 w-4" />
+              {desktopSidebarOpen && <span>Sign Out</span>}
+            </Link>
+          </Button>
+        </div>
+      </aside>
+
+      {/* Mobile Drawer Overlay (shown on mobile when hamburger is clicked) */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-xl animate-in fade-in-0 duration-200">
+          {/* Mobile Header */}
+          <div className="flex h-16 items-center justify-between px-4 border-b border-border/50 bg-card/50">
+            <Link href="/dashboard" onClick={closeMobileMenu} className="flex items-center gap-2">
+              <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-md shadow-blue-500/20">
                 <Brain className="h-5 w-5 text-white" />
               </div>
-              {sidebarOpen && <span className="font-semibold text-lg gradient-text">SkillDNA</span>}
+              <span className="font-semibold text-lg gradient-text">SkillDNA</span>
             </Link>
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-muted-foreground hover:text-foreground"
-              aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+              onClick={closeMobileMenu}
+              className="text-foreground hover:bg-accent"
+              aria-label="Close mobile menu"
             >
-              {sidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              <X className="h-6 w-6" />
             </Button>
           </div>
 
-          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" role="navigation" aria-label="Main navigation">
+          {/* Mobile Navigation List */}
+          <nav className="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto">
+            <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Dashboard Navigation
+            </p>
             {navigation.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+              const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={handleNavClick}
+                  onClick={closeMobileMenu}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                    "flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-base font-medium transition-all border",
                     isActive
-                      ? "bg-primary/10 text-primary border border-primary/20"
-                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                      ? "bg-primary/10 text-primary border-primary/20 font-semibold"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground border-transparent"
                   )}
-                  title={sidebarOpen ? undefined : item.name}
                 >
-                  <item.icon className={cn("h-5 w-5 flex-shrink-0", isActive && "text-primary")} />
-                  {sidebarOpen && <span>{item.name}</span>}
+                  <div className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
+                    isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                  )}>
+                    <item.icon className="h-5 w-5" />
+                  </div>
+                  <span>{item.name}</span>
                 </Link>
               )
             })}
           </nav>
 
-          <div className="p-3 border-t border-border/50">
-            <Button
-              variant="outline"
-              className="w-full justify-start gap-3"
-              asChild
-            >
-              <Link href="/" onClick={handleNavClick}>
-                <Users className="h-4 w-4" />
-                {sidebarOpen && <span>Sign Out</span>}
-              </Link>
-            </Button>
+          {/* Mobile Footer */}
+          <div className="p-4 border-t border-border/50 bg-card/30 flex flex-col gap-3">
+            <div className="flex items-center gap-3 px-2">
+              <Avatar className="h-10 w-10 border border-border">
+                <AvatarImage src={session?.user?.image || ""} />
+                <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                  {session?.user?.name?.[0] || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col min-w-0">
+                <p className="text-sm font-semibold truncate">{session?.user?.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{session?.user?.email}</p>
+              </div>
+            </div>
+
+            <Link href="/" onClick={closeMobileMenu} className="w-full">
+              <Button variant="outline" className="w-full justify-center gap-2 h-11 text-sm font-medium border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300">
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
+            </Link>
           </div>
         </div>
-      </aside>
+      )}
 
-      <div className={cn("flex-1 flex flex-col overflow-hidden transition-all duration-300", sidebarOpen ? "lg:ml-64" : "lg:ml-20")}>
+      {/* Main Content Area */}
+      <div className={cn(
+        "flex-1 flex flex-col overflow-hidden transition-all duration-300 w-full",
+        desktopSidebarOpen ? "lg:ml-64" : "lg:ml-20"
+      )}>
+        {/* Header */}
         <header className="h-16 bg-card/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-30">
           <div className="flex h-full items-center justify-between px-4 sm:px-6">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              {/* Mobile Hamburger Toggle Button */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
-                onClick={() => setSidebarOpen(true)}
-                aria-label="Open sidebar"
+                className="lg:hidden text-foreground hover:bg-accent"
+                onClick={() => setMobileMenuOpen(true)}
+                aria-label="Open mobile menu"
               >
-                <LayoutDashboard className="h-5 w-5" />
+                <Menu className="h-6 w-6" />
               </Button>
+
               <h1 className="text-lg font-semibold truncate">
-                {navigation.find((item) => pathname === item.href || pathname.startsWith(item.href + "/"))?.name || "Dashboard"}
+                {navigation.find((item) => pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href)))?.name || "Dashboard"}
               </h1>
             </div>
 
@@ -206,7 +288,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8 max-w-full overflow-x-hidden">
           {children}
         </main>
       </div>
