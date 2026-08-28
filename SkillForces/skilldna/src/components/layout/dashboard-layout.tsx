@@ -13,7 +13,6 @@ import {
   Dna, 
   Search, 
   MapPin, 
-  FlaskConical, 
   Briefcase, 
   Code, 
   Newspaper, 
@@ -21,7 +20,6 @@ import {
   TrendingUp, 
   Settings,
   Bell,
-  Search as SearchIcon,
   ChevronLeft,
   ChevronRight,
   Brain,
@@ -29,7 +27,6 @@ import {
   Users,
   Crown
 } from "lucide-react"
-import { signOut, useSession } from "next-auth/react"
 
 const navigation = [
   { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
@@ -48,7 +45,13 @@ const navigation = [
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const pathname = usePathname()
-  const { data: session } = useSession()
+  const session = {
+    user: {
+      name: "Satyam Kumar",
+      email: "satyam@example.com",
+      image: ""
+    }
+  }
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -103,10 +106,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <Button
               variant="outline"
               className="w-full justify-start gap-3"
-              onClick={() => signOut({ callbackUrl: "/" })}
+              asChild
             >
-              <Users className="h-4 w-4" />
-              {sidebarOpen && <span>Sign Out</span>}
+              <Link href="/">
+                <Users className="h-4 w-4" />
+                {sidebarOpen && <span>Sign Out</span>}
+              </Link>
             </Button>
           </div>
         </div>
@@ -182,8 +187,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })} className="text-red-400 focus:text-red-400">
-                    Sign Out
+                  <DropdownMenuItem asChild>
+                    <Link href="/" className="w-full text-red-400 focus:text-red-400">
+                      Sign Out
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

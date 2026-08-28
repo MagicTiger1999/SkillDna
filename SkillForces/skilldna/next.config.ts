@@ -1,8 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "export",
+  basePath: "/SkillDna",
+  trailingSlash: true,
   typescript: {
     ignoreBuildErrors: true,
+  },
+  images: {
+    unoptimized: true,
   },
 };
 
